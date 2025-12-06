@@ -1,0 +1,78 @@
+name: Build and Deploy Chatbot to ECS
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - projects/backend-services/**
+      - .github/workflows/deploy-backend.yml
+      - .github/templates/ecs-task-definition-backend-staging.json
+      # - .github/templates/ecs-task-definition-backend-prod.json
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  ecr-build-and-deploy:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ${{ vars.GH_RUNNER_VERSION }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::839406385778:role/fisycalgithubaction 
+          role-session-name: ChatAssistantBuildSession
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build, tag, and push docker image to Amazon ECR
+        working-directory: ./projects/backend-services
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: chat-backend-services
+          IMAGE_TAG: ${{ github.sha }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          CLIENT_SECRET: ${{ secrets.DEV_API_SECRET }}
+          MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
+        run: |
+          docker build \
+          -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          echo "IMAGE_NAME=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}" >> $GITHUB_ENV
+      - name: Render a new staging task definition
+        id: render-app-container
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: .github/templates/ecs-task-definition-backend-staging.json
+          container-name: chat-backend-services
+          image: ${{ env.IMAGE_NAME }}
+          environment-variables: |
+            OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+            CLIENT_SECRET: ${{ secrets.DEV_API_SECRET }}
+            MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
+
+      - name: Deploy to staging ECS service
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.render-app-container.outputs.task-definition }}
+          service: demo-chatbot-frontend
+          cluster: demo-chatbot-frontend
+          wait-for-service-stability: true
+      # - name: Render a new production ECS task definition
+      #   id: render-app-container-prod
+      #   uses: aws-actions/amazon-ecs-render-task-definition@v1
+      #   with:
+      #     task-definition: .github/templates/ecs-task-definition-backend-prod.json
+      #     container-name: chat-backend-services
+      #     image: ${{ env.IMAGE_NAME }}
+      #     environment-variables: |
+      #       MONGO_CONNECTION_STRING=${{ secrets.PROD_MONGO_CONNECTION_STRING }}
+      #       CLIENT_SECRET=${{ secrets.PROD_API_SECRET }}
+      # - name: Register the new production ECS task definition
+      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      #   with:
+      #     task-definition: ${{ steps.render-app-container-prod.outputs.task-definition }}

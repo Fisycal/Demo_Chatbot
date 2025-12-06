@@ -1,0 +1,47 @@
+{
+    "family": "demo-chatbot",
+    "containerDefinitions": [
+        {
+            "name": "demo-chatbot",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "api-server",
+                    "containerPort": 8080,
+                    "hostPort": 8080,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "ulimits": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/demo1",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            },
+            "systemControls": []
+        }
+    ],
+    "networkMode": "awsvpc",
+    "taskRoleArn": "arn:aws:iam::3397xiisyiis:role/ecsTaskExecutionRole",
+    "executionRoleArn": "arn:aws:iam::3397sggsfhhs:role/ecsTaskExecutionRole",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512",
+    "runtimePlatform": {
+        "cpuArchitecture": "X86_64",
+        "operatingSystemFamily": "LINUX"
+    }
+}
