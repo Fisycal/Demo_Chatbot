@@ -1,4 +1,4 @@
-name: Build and Deploy Chatbot to ECS
+name: Build and Deploy Chatbot to ECS - Backend
 
 on:
   workflow_dispatch:
