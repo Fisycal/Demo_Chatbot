@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - projects/backend-services/**
-      - .github/workflows/deploy-backend.yml
-      - .github/templates/ecs-task-definition-backend-staging.json
-      # - .github/templates/ecs-task-definition-backend-prod.json
+      - Project/genai-frontend/**
+      - .github/workflows/deploy-frontend.yml
+      - .github/templates/ecs-task-definition-frontend-staging.json
+      # - .github/templates/ecs-task-definition-frontend-prod.json
 
 permissions:
   id-token: write
@@ -30,14 +30,14 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
       - name: Build, tag, and push docker image to Amazon ECR
-        working-directory: ./projects/backend-services
+        working-directory: ./Project/genai-frontend
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: chat-backend-services
+          REPOSITORY: chat-frontend-services
           IMAGE_TAG: ${{ github.sha }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          CLIENT_SECRET: ${{ secrets.DEV_API_SECRET }}
-          MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
+          # OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          # CLIENT_SECRET: ${{ secrets.DEV_API_SECRET }}
+          # MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
         run: |
           docker build \
           -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
@@ -47,8 +47,8 @@ jobs:
         id: render-app-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: .github/templates/ecs-task-definition-backend-staging.json
-          container-name: chat-backend-services
+          task-definition: .github/templates/ecs-task-definition-frontend-staging.json
+          container-name: demo-chatbot-frontend
           image: ${{ env.IMAGE_NAME }}
           environment-variables: |
             OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -66,8 +66,8 @@ jobs:
       #   id: render-app-container-prod
       #   uses: aws-actions/amazon-ecs-render-task-definition@v1
       #   with:
-      #     task-definition: .github/templates/ecs-task-definition-backend-prod.json
-      #     container-name: chat-backend-services
+      #     task-definition: .github/templates/ecs-task-definition-frontend-prod.json
+      #     container-name: chat-frontend-services
       #     image: ${{ env.IMAGE_NAME }}
       #     environment-variables: |
       #       MONGO_CONNECTION_STRING=${{ secrets.PROD_MONGO_CONNECTION_STRING }}

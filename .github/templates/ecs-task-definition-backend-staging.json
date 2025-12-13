@@ -2,7 +2,7 @@
     "family": "demo-chatbot",
     "containerDefinitions": [
         {
-            "name": "demo-chatbot",
+            "name": "demo-chatbot-backend",
             "cpu": 0,
             "portMappings": [
                 {
@@ -33,8 +33,8 @@
         }
     ],
     "networkMode": "awsvpc",
-    "taskRoleArn": "arn:aws:iam::3397xiisyiis:role/ecsTaskExecutionRole",
-    "executionRoleArn": "arn:aws:iam::3397sggsfhhs:role/ecsTaskExecutionRole",
+    "taskRoleArn": "arn:aws:iam::839406385778:role/fisycalgithubaction",
+    "executionRoleArn": "arn:aws:iam::839406385778:role/ecs_task_exec_role",
     "requiresCompatibilities": [
         "FARGATE"
     ],

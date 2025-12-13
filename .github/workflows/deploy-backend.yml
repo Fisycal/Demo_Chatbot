@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - projects/genai-backend/**
+      - Project/genai-backend/**
       - .github/workflows/deploy-backend.yml
       - .github/templates/ecs-task-definition-backend-staging.json
       # - .github/templates/ecs-task-definition-backend-prod.json
@@ -48,7 +48,7 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: .github/templates/ecs-task-definition-backend-staging.json
-          container-name: chat-backend-services
+          container-name: demo-chatbot-backend
           image: ${{ env.IMAGE_NAME }}
           environment-variables: |
             OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
