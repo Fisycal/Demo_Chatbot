@@ -1,0 +1,57 @@
+name: Build and Deploy Chatbot to Lambda - Backend
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - Project/genai-backend/**
+      - .github/workflows/deploy-backend-lambda.yml
+      # - .github/templates/ecs-task-definition-backend-staging.json
+      # - .github/templates/ecs-task-definition-backend-prod.json
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  ecr-build-and-deploy:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ${{ vars.GH_RUNNER_VERSION }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::839406385778:role/fisycalgithubaction
+          role-session-name: ChatAssistantBuildSession
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build, tag, and push docker image to Amazon ECR
+        working-directory: ./Project/genai-backend
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: chat-backend-services
+          IMAGE_TAG: ${{ github.sha }}
+          # OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          # CLIENT_SECRET: ${{ secrets.DEV_API_SECRET }}
+          # MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
+        run: |
+          docker build \
+          -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          echo "IMAGE_NAME=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}" >> $GITHUB_ENV
+
+      - name: Update Dev Lambda deployment to use new image
+        run: |
+          aws lambda update-function-code --function-name=demo-chatbot-backend --image-uri=${{ env.IMAGE_NAME }}
+          sleep 180
+          aws lambda publish-version --function-name=demo-chatbot-backend
+
+      # - name: Update Prod Lambda deployment to use new image
+      #   run: |
+      #     aws lambda update-function-code --function-name=demo-chatbot-backend --image-uri=${{ env.IMAGE_NAME }}
+      #     sleep 60
+      #     aws lambda publish-version --function-name=demo-chatbot-backend
