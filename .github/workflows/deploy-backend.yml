@@ -51,9 +51,9 @@ jobs:
           container-name: demo-chatbot-backend
           image: ${{ env.IMAGE_NAME }}
           environment-variables: |
-            OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-            CLIENT_SECRET: ${{ secrets.DEV_API_SECRET }}
-            MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
+            OPENAI_API_KEY= ${{ secrets.OPENAI_API_KEY }}
+            CLIENT_SECRET= ${{ secrets.DEV_API_SECRET }}
+            MONGO_CONNECTION_STRING= ${{ secrets.MONGO_CONNECTION_STRING }}
 
       - name: Deploy to staging ECS service
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
