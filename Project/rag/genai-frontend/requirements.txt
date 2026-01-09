@@ -1,0 +1,17 @@
+streamlit==1.41.1
+pyopenssL==24.0.0
+python-dotenv==1.0.1
+pymongo==4.10.1
+extra-streamlit-components==0.1.71
+pandas==2.2.3
+httpx==0.28.1
+scikit-learn==1.5.1
+PyDrive2==1.20.0
+pypandoc==1.13
+pypdf==4.3.1
+tiktoken==0.5.2
+pydantic==2.10.4
+beautifulsoup4==4.12.2
+unstructured
+unstructured[pdf]
+markdown

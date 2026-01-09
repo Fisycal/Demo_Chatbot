@@ -1,0 +1,28 @@
+fastapi>=0.110
+uvicorn[standard]>=0.27
+pydantic>=2.6
+pydantic-settings>=2.2
+python-dotenv>=1.0
+httpx>=0.27
+pyjwt>=2.9
+motor>=3.4
+qdrant-client>=1.8
+opentelemetry-api>=1.24
+opentelemetry-sdk>=1.24
+opentelemetry-exporter-otlp>=1.24
+opentelemetry-instrumentation-fastapi>=0.45b0
+opentelemetry-instrumentation-httpx>=0.45b0
+arize-phoenix-otel 
+openinference-instrumentation-openai
+prometheus-fastapi-instrumentator>=6.1
+# AutoGen AgentChat + OpenAI extension
+autogen-agentchat>=0.4
+autogen-ext[openai]>=0.4
+
+# Google Calendar (optional)
+google-api-python-client>=2.130
+google-auth>=2.29
+google-auth-oauthlib>=1.2
+
+# Temporal (optional)
+temporalio>=1.6

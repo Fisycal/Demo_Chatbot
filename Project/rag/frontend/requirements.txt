@@ -1,0 +1,13 @@
+# Core
+streamlit>=1.41
+httpx>=0.28
+python-dotenv>=1.0
+pydantic>=2.10
+
+# Note: The packages below are only needed if DocumentChat.py is used with a document processing backend
+# Uncomment if needed:
+# extra-streamlit-components>=0.1.71
+# pymongo>=4.10
+# pandas>=2.2
+# pypdf>=4.3
+# unstructured[pdf]

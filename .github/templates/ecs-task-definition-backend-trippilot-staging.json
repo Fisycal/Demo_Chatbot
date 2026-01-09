@@ -1,0 +1,47 @@
+{
+    "family": "trippilot-agent",
+    "containerDefinitions": [
+        {
+            "name": "trippilot-agent",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "api-server",
+                    "containerPort": 8000,
+                    "hostPort": 8000,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "ulimits": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/trippilot-backend",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            },
+            "systemControls": []
+        }
+    ],
+    "networkMode": "awsvpc",
+    "taskRoleArn": "arn:aws:iam::839406385778:role/fisycalgithubaction",
+    "executionRoleArn": "arn:aws:iam::839406385778:role/ecs_task_exec_role",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512",
+    "runtimePlatform": {
+        "cpuArchitecture": "X86_64",
+        "operatingSystemFamily": "LINUX"
+    }
+}
